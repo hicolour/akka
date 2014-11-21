@@ -162,6 +162,14 @@ In this case, a persistent actor must be recovered explicitly by sending it a ``
 
 .. includecode:: code/docs/persistence/PersistenceDocTest.java#recover-explicit
 
+.. warning::
+  If  ``preStart`` will be overridden by empty implementation, without recovery phase invoked by the ``super.preStart()`` or explicitly by sending it a ``Recover.create()`` 
+  message from outer or inner scope, persistent actor will not process new messages other than ``Recover``.
+
+To fully disable recovery phase and be able to send messages to persistent actor ``preStart`` needs to be overridden, and  persistent actor must be recovered explicitly by sending it a ``Recover.create(0L)`` message.
+
+.. includecode:: code/docs/persistence/PersistenceDocTest.java#recover-fully-disabled
+
 If not overridden, ``preStart`` sends a ``Recover`` message to ``getSelf()``. Applications may also override
 ``preStart`` to define further ``Recover`` parameters such as an upper sequence number bound, for example.
 
