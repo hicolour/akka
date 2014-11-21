@@ -139,19 +139,28 @@ Recovery
 --------
 
 By default, a persistent actor is automatically recovered on start and on restart by replaying journaled messages.
-New messages sent to a persistent actor during recovery do not interfere with replayed messages. New messages will
-only be received by a persistent actor after recovery completes.
+New messages sent to a persistent actor during recovery do not interfere with replayed messages. 
+They are cached and received by a persistent actor after recovery phase completes.
 
 Recovery customization
 ^^^^^^^^^^^^^^^^^^^^^^
 
-Automated recovery on start can be disabled by overriding ``preStart`` with an empty implementation.
+Automated recovery on start can be disabled by overriding ``preStart`` with an empty or custom implementation.
 
 .. includecode:: code/docs/persistence/PersistenceDocSpec.scala#recover-on-start-disabled
 
 In this case, a persistent actor must be recovered explicitly by sending it a ``Recover()`` message.
 
 .. includecode:: code/docs/persistence/PersistenceDocSpec.scala#recover-explicit
+
+.. warning::
+  If  ``preStart`` will be overridden by empty implementation, without recovery phase invoked by the ``super.preStart`` or explicitly by sending it a ``Recover()`` 
+  message, persistent actor will not process new messages. Internal messages processor will not start processing new messages, until it will not 
+  get ``Recovery`` message and until recovery phase initialized by this message will not be finished.
+
+To disable recovery of the journaled messages and to be able to allow  persistent actor to recive new messages, ``preStart``needs to be overriden and persistent actor must be recovered explicitly by sending it a ``Recover(toSequenceNr = OL)`` message containing reference to initial sequence number.
+
+.. includecode:: code/docs/persistence/PersistenceDocSpec.scala#recover-fully-disabled
 
 If not overridden, ``preStart`` sends a ``Recover()`` message to ``self``. Applications may also override
 ``preStart`` to define further ``Recover()`` parameters such as an upper sequence number bound, for example.
