@@ -166,6 +166,20 @@ public class PersistenceDocTest {
             //#recovery-completed
         }
     };
+
+    static Object o3 = new Object() {
+        abstract class MyProcessor1 extends UntypedPersistentActor {
+            //#recover-fully-disabled
+            @Override
+            public void preStart() { getSelf().tell(Recover.create(0L), null); }
+            //#recover-fully-disabled
+
+            //##recover-fully-disabled
+            @Override
+            public void preRestart(Throwable reason, Option<Object> message) {}
+            //#recover-fully-disabled
+        }
+    };
     
     static Object atLeastOnceExample = new Object() {
       //#at-least-once-example

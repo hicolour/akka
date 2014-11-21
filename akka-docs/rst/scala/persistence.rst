@@ -145,13 +145,24 @@ only be received by a persistent actor after recovery completes.
 Recovery customization
 ^^^^^^^^^^^^^^^^^^^^^^
 
-Automated recovery on start can be disabled by overriding ``preStart`` with an empty implementation.
+Automated recovery on start can be disabled by overriding ``preStart`` with an empty implementation. 
 
 .. includecode:: code/docs/persistence/PersistenceDocSpec.scala#recover-on-start-disabled
 
-In this case, a persistent actor must be recovered explicitly by sending it a ``Recover()`` message.
+In this case, a persistent actor must be recovered explicitly by sending it a ``Recover()``message. 
 
 .. includecode:: code/docs/persistence/PersistenceDocSpec.scala#recover-explicit
+
+.. warning::
+  If  ``preStart`` will be overiden with empty implentation, without recovery phase invoked by the ``super.preStart`` or explicitly by sending it a ``Recover()`` 
+  message from outer or inner scope, persistent actor will not process new messages other than ``Recover``.
+
+
+To fully disable recovery phase and be able to send messages to persistent actor, ``preStart``needs to be overriden, and  persistent actor must be recovered explicitly by sending it a ``Recover(toSequenceNr = OL)``.
+
+
+.. includecode:: code/docs/persistence/PersistenceDocSpec.scala#recover-fully-disabled
+
 
 If not overridden, ``preStart`` sends a ``Recover()`` message to ``self``. Applications may also override
 ``preStart`` to define further ``Recover()`` parameters such as an upper sequence number bound, for example.
